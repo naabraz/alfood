@@ -9,6 +9,7 @@ import Restaurante from './Restaurante';
 const ListaRestaurantes = () => {
   const [restaurantes, setRestaurantes] = useState<IRestaurante[]>([]);
   const [proximaPagina, setProximaPagina] = useState('');
+  const [paginaAnterior, setPaginaAnterior] = useState('');
 
   useEffect(() => {
     axios
@@ -18,6 +19,7 @@ const ListaRestaurantes = () => {
       .then((resposta) => {
         setRestaurantes(resposta.data.results);
         setProximaPagina(resposta.data.next);
+        setPaginaAnterior(resposta.data.previous);
       })
       .catch((erro) => {
         console.log(erro);
@@ -30,6 +32,19 @@ const ListaRestaurantes = () => {
       .then((resposta) => {
         setRestaurantes([...restaurantes, ...resposta.data.results]);
         setProximaPagina(resposta.data.next);
+        setPaginaAnterior(resposta.data.previous);
+      })
+      .catch((erro) => {
+        console.log(erro);
+      });
+  };
+
+  const verAnterior = () => {
+    axios
+      .get<IPaginacao<IRestaurante>>(paginaAnterior)
+      .then((resposta) => {
+        setRestaurantes([...restaurantes, ...resposta.data.results]);
+        setPaginaAnterior(resposta.data.previous);
       })
       .catch((erro) => {
         console.log(erro);
@@ -45,6 +60,7 @@ const ListaRestaurantes = () => {
         <Restaurante restaurante={item} key={item.id} />
       ))}
       {proximaPagina && <button onClick={verMais}>ver mais</button>}
+      {paginaAnterior && <button onClick={verAnterior}>ver anterior</button>}
     </section>
   );
 };
