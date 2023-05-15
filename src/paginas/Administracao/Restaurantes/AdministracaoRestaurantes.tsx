@@ -7,6 +7,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  Button,
 } from '@mui/material';
 
 import IRestaurante from '../../../interfaces/IRestaurante';
@@ -22,6 +23,19 @@ const AdministracaoRestaurantes = () => {
       .then((resposta) => setRestaurantes(resposta.data));
   }, []);
 
+  const excluir = (restauranteAhSerExcluido: IRestaurante) => {
+    axios
+      .delete(
+        `http://0.0.0.0:8000/api/v2/restaurantes/${restauranteAhSerExcluido.id}/`
+      )
+      .then(() => {
+        const listaDeRestaurante = restaurantes.filter(
+          (restaurante) => restaurante.id !== restauranteAhSerExcluido.id
+        );
+        setRestaurantes([...listaDeRestaurante]);
+      });
+  };
+
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -29,6 +43,7 @@ const AdministracaoRestaurantes = () => {
           <TableRow>
             <TableCell>Nome</TableCell>
             <TableCell>Editar</TableCell>
+            <TableCell>Excluir</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -39,6 +54,15 @@ const AdministracaoRestaurantes = () => {
                 [
                 <Link to={`/admin/restaurantes/${restaurante.id}`}>editar</Link>
                 ]
+              </TableCell>
+              <TableCell>
+                <Button
+                  variant='outlined'
+                  color='error'
+                  onClick={() => excluir(restaurante)}
+                >
+                  Excluir
+                </Button>
               </TableCell>
             </TableRow>
           ))}
